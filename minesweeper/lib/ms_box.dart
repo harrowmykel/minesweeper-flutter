@@ -4,7 +4,7 @@ import 'package:minesweeper/ms_controller.dart';
 
 class MSBox extends StatelessWidget {
   final MSController controller;
-  final int index;
+  final MSBoxPosition index;
   final double boxBlockSize;
   final double padding;
 
@@ -18,12 +18,15 @@ class MSBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MSBoxItem box = controller.getBox(index);
+    MSBoxItem? box = controller.getBox(index);
+    if (box == null) {
+      return const SizedBox.shrink();
+    }
 
     Widget child = const SizedBox.shrink();
-    if (box.state == MSBoxState.Flagged) {
+    if (box.state == MSBoxState.flagged) {
       child = const Icon(FontAwesomeIcons.flag);
-    } else if (box.state == MSBoxState.Opened) {
+    } else if (box.state == MSBoxState.opened) {
       child = Text(
         box.value,
         style: TextStyle(fontSize: (boxBlockSize - 4)),

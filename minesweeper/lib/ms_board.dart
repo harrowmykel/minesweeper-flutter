@@ -39,7 +39,7 @@ class MSBoard extends StatelessWidget {
                   index++;
                   return MSBox(
                     controller: controller,
-                    index: index,
+                    index: MSBoxPosition(x, y),
                     boxBlockSize: boxBlockSize,
                     padding: padding / 2,
                   );
