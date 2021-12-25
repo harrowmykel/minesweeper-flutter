@@ -1,10 +1,18 @@
 import 'dart:math';
 
+import 'package:minesweeper/ms_models.dart';
+
 class MSController {
   int seconds = 0;
   List<List<MSBoxItem>> _boxes = [];
   bool _boardSetUp = false;
   bool _minesSetUp = false;
+  int remainingHelp = 5;
+  bool helpShown = false;
+
+  bool openAll = false;
+  bool openMines = false;
+  int flaggedBox = 0;
 
   final Function() _setStateFn;
   final MSDifficulty difficulty;
@@ -35,27 +43,22 @@ class MSController {
   }
 
   int get mineCount {
-    if (difficulty == MSDifficulty.intermediate) return 90;
-    if (difficulty == MSDifficulty.expert) return 40;
-    return 10;
+    return (boardItemsCount ~/ 2) - 30;
+
+    // if (difficulty == MSDifficulty.intermediate) return 90;
+    // if (difficulty == MSDifficulty.expert) return 40;
+    // return 10;
   }
 
   int get _totalFlagCount {
-    if (difficulty == MSDifficulty.intermediate) return 30;
-    if (difficulty == MSDifficulty.expert) return 20;
-    return 10;
+    return mineCount - 12;
+    // if (difficulty == MSDifficulty.intermediate) return 30;
+    // if (difficulty == MSDifficulty.expert) return 20;
+    // return 10;
   }
 
   int get flagCount {
     if (!_boardSetUp) _setUpBoard();
-    int flaggedBox = 0;
-    for (int j = 0; j < boardHeight; j++) {
-      for (int i = 0; i < boardWidth; i++) {
-        if ((_boxes[j][i]).state == MSBoxState.flagged) {
-          flaggedBox++;
-        }
-      }
-    }
     return (_totalFlagCount - flaggedBox);
   }
 
@@ -76,13 +79,42 @@ class MSController {
     if (!_minesSetUp) _setUpMines(position);
 
     MSBoxItem? box = getBox(position);
-    if (box == null) {
+    if (box == null) return;
+    if (box.isFlagged) return;
+    if (box.hasMine) {
+      //gameover
+      helpShown = true;
+      _gameOver();
       return;
     }
-    if (box.hasMine) {
-      //has mine @TODO
-    }
+    int x = box.position.x;
+    int y = box.position.y;
+    openNeighboursWithNoMine(x, y);
     box.state = MSBoxState.opened;
+    _setStateFn();
+  }
+
+  void _gameOver() {
+    //open all
+    openAll = true;
+    _setStateFn();
+  }
+
+  void help() async {
+    if (remainingHelp == 0 || helpShown) return;
+    if (!_boardSetUp) return;
+
+    helpShown = true;
+
+    openMines = true;
+    remainingHelp--;
+    _setStateFn();
+
+    await Future.delayed(const Duration(seconds: 6));
+
+    openMines = false;
+
+    helpShown = false;
     _setStateFn();
   }
 
@@ -95,18 +127,24 @@ class MSController {
     if (box == null) {
       return;
     }
-    if (box.state == MSBoxState.opened || flagCount == 0) {
+    if (box.isOpened || flagCount == 0) {
       return;
     }
-    box.state = box.state == MSBoxState.flagged
-        ? MSBoxState.unflagged
-        : MSBoxState.flagged;
+    if (box.isFlagged) {
+      flaggedBox--;
+    } else {
+      flaggedBox++;
+    }
+    box.toggleFlag();
     _setStateFn();
   }
 
   void _setUpBoard() {
     if (_boardSetUp) return;
+
+    print('board setup');
     _boxes = [];
+
     int index = 0;
     for (int j = 0; j < boardHeight; j++) {
       _boxes.add([]);
@@ -115,7 +153,7 @@ class MSController {
           MSBoxItem(
             index: index,
             position: MSBoxPosition(i, j),
-            state: MSBoxState.opened,
+            // state: MSBoxState.opened,
           ),
         );
         index++;
@@ -127,6 +165,7 @@ class MSController {
 
   void _setUpMines(MSBoxPosition position) {
     if (_minesSetUp) return;
+    print('mine setup');
 
     int count = mineCount;
     int bCount = boardItemsCount;
@@ -144,6 +183,7 @@ class MSController {
 
       int y = (rand == 0) ? 0 : (rand ~/ boardWidth);
       int x = (rand == 0) ? 0 : rand % boardWidth;
+      // print('$x , $y');
       _boxes[y][x].hasMine = true;
     }
 
@@ -182,39 +222,28 @@ class MSController {
     return box != null && box.hasMine;
   }
 
-  void reset() {
-    _boxes = [];
-    _boardSetUp = false;
-    _minesSetUp = false;
-    _setStateFn();
+  void openIfHasNoNeighbourMineAndNotFlagged(int x, int y) {
+    MSBoxItem? box = getBox(MSBoxPosition(x, y));
+    if (box == null) return;
+    if (!box.hasNoNeighbourMine) return;
+    if (box.isOpened || box.isFlagged) return;
+
+    box.open();
+
+    openNeighboursWithNoMine(box.position.x, box.position.y);
   }
-}
 
-enum MSBoxState { opened, flagged, unflagged }
-
-enum MSDifficulty { beginner, intermediate, expert }
-
-class MSBoxItem {
-  MSBoxState state;
-  bool hasMine = false;
-  MSBoxPosition position;
-  int index;
-  int neighbourMineCounts = 0;
-
-  MSBoxItem({
-    this.state = MSBoxState.unflagged,
-    required this.position,
-    this.index = 0,
-  });
-
-  String get value {
-    return hasMine ? 'B' : '$neighbourMineCounts';
+  void openNeighboursWithNoMine(x, y) {
+    //top
+    openIfHasNoNeighbourMineAndNotFlagged(x - 1, y - 1);
+    openIfHasNoNeighbourMineAndNotFlagged(x, y - 1);
+    openIfHasNoNeighbourMineAndNotFlagged(x + 1, y - 1);
+    //same row
+    openIfHasNoNeighbourMineAndNotFlagged(x - 1, y);
+    openIfHasNoNeighbourMineAndNotFlagged(x + 1, y);
+    //bottom
+    openIfHasNoNeighbourMineAndNotFlagged(x - 1, y + 1);
+    openIfHasNoNeighbourMineAndNotFlagged(x, y + 1);
+    openIfHasNoNeighbourMineAndNotFlagged(x + 1, y + 1);
   }
-}
-
-class MSBoxPosition {
-  final int x;
-  final int y;
-
-  const MSBoxPosition(this.x, this.y);
 }

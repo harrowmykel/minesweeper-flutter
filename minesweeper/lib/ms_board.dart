@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:minesweeper/ms_box.dart';
 import 'package:minesweeper/ms_controller.dart';
+import 'package:minesweeper/ms_models.dart';
 
 class MSBoard extends StatelessWidget {
   final MSController controller;
@@ -26,7 +27,6 @@ class MSBoard extends StatelessWidget {
     double height = sHeight / bHeight;
 
     double boxBlockSize = min(height, width);
-    int index = -1;
 
     return Container(
       alignment: Alignment.center,
@@ -36,7 +36,6 @@ class MSBoard extends StatelessWidget {
             children: List.generate(bHeight, (y) {
               return Row(
                 children: List.generate(bWidth, (x) {
-                  index++;
                   return MSBox(
                     controller: controller,
                     index: MSBoxPosition(x, y),

@@ -5,8 +5,11 @@ import 'package:minesweeper/ms_controller.dart';
 
 class MSActionBar extends StatelessWidget {
   final MSController controller;
+  final Function() reset;
+
   const MSActionBar({
     required this.controller,
+    required this.reset,
     Key? key,
   }) : super(key: key);
 
@@ -15,7 +18,7 @@ class MSActionBar extends StatelessWidget {
     return Container(
       height: 50,
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
       color: Colors.purple,
       child: Row(
         children: [
@@ -24,7 +27,7 @@ class MSActionBar extends StatelessWidget {
             FontAwesomeIcons.clock,
           ),
           const SizedBox(
-            width: 70,
+            width: 5,
           ),
           MSActionBarText(
             '${controller.flagCount}',
@@ -33,12 +36,23 @@ class MSActionBar extends StatelessWidget {
           const Expanded(
             child: SizedBox.shrink(),
           ),
+          if (!controller.helpShown)
+            GestureDetector(
+              child: MSActionBarText(
+                'Hint (${controller.remainingHelp})',
+                FontAwesomeIcons.info,
+              ),
+              onTap: () => controller.help(),
+            ),
+          const SizedBox(
+            width: 10,
+          ),
           IconButton(
             icon: const Icon(
               FontAwesomeIcons.sync,
               color: Colors.white,
             ),
-            onPressed: () => controller.reset(),
+            onPressed: reset,
           ),
         ],
       ),
