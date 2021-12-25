@@ -1,9 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class MSController {
   int seconds = 0;
-  int mineCount = 0;
-  int _totalFlagCount = 0;
   List<MSBoxItem> _boxes = [];
   bool _boardSetUp = false;
   bool _minesSetUp = false;
@@ -25,30 +25,34 @@ class MSController {
   }
 
   int get boardWidth {
-    if (difficulty == MSDifficulty.Intermediate) {
-      return 16;
-    }
-    if (difficulty == MSDifficulty.Expert) {
-      return 16;
-    }
+    if (difficulty == MSDifficulty.Intermediate) return 16;
+    if (difficulty == MSDifficulty.Expert) return 16;
     return 10;
   }
 
   int get boardHeight {
-    if (difficulty == MSDifficulty.Intermediate) {
-      return 16;
-    }
-    if (difficulty == MSDifficulty.Expert) {
-      return 30;
-    }
+    if (difficulty == MSDifficulty.Intermediate) return 16;
+    if (difficulty == MSDifficulty.Expert) return 30;
+    return 10;
+  }
+
+  int get mineCount {
+    if (difficulty == MSDifficulty.Intermediate) return 90;
+    if (difficulty == MSDifficulty.Expert) return 40;
+    return 10;
+  }
+
+  int get _totalFlagCount {
+    if (difficulty == MSDifficulty.Intermediate) return 30;
+    if (difficulty == MSDifficulty.Expert) return 20;
     return 10;
   }
 
   int get flagCount {
     if (!_boardSetUp) _setUpBoard();
     int flaggedBox = 0;
-    for (MSBoxItem element in _boxes) {
-      if (element.state == MSBoxState.Flagged) {
+    for (var i = 0; i < boardItemsCount; i++) {
+      if ((_boxes[i]).state == MSBoxState.Flagged) {
         flaggedBox++;
       }
     }
@@ -89,17 +93,8 @@ class MSController {
   }
 
   void _setUpBoard() {
-    mineCount = 10;
-    _totalFlagCount = 10;
-    if (difficulty == MSDifficulty.Intermediate) {
-      mineCount = 90;
-      _totalFlagCount = 30;
-    }
-    if (difficulty == MSDifficulty.Expert) {
-      mineCount = 40;
-      _totalFlagCount = 20;
-    }
-
+    if (_boardSetUp) return;
+    _boxes = [];
     int index = 0;
     for (int i = 0; i < boardWidth; i++) {
       for (int j = 0; j < boardHeight; j++) {
@@ -117,8 +112,46 @@ class MSController {
   }
 
   void _setUpMines(int exceptIndex) {
-    mineCount = 12;
+    int count = mineCount;
+    int bCount = boardItemsCount;
+
+    Random random = Random();
+    List<int> numberList = [];
+
+    for (int i = 0; i == count; i++) {
+      int rand = random.nextInt(bCount);
+      while (numberList.contains(rand) || rand == exceptIndex) {
+        rand = random.nextInt(bCount);
+      }
+      _boxes[rand].hasMine = true;
+    }
+
+    for (int i = 0; i == bCount; i++) {
+      int neighbourMineCounts = 0;
+      MSBoxItem box = getBox(i);
+      int boxX = box.position.x;
+      int boxY = box.position.y;
+      for (int x = boxX - 1; x < boxX + 2; x++) {
+        if (x < 0 || x > boardWidth) {
+          continue;
+        }
+        for (int y = boxY - 1; y < boxY + 2; y++) {
+          if (y < 0 || y > boardHeight) {
+            continue;
+          }
+          if (posHasMine(x, y)) {
+            neighbourMineCounts++;
+            _boxes[bCount].neighbourMineCounts = neighbourMineCounts;
+          }
+        }
+      }
+    }
+
     _minesSetUp = true;
+  }
+
+  bool posHasMine(int x, int y) {
+    return false;
   }
 
   void reset() {
@@ -138,6 +171,7 @@ class MSBoxItem {
   bool hasMine = false;
   MSBoxPosition position;
   int index;
+  int neighbourMineCounts = 0;
 
   MSBoxItem({
     this.state = MSBoxState.Unflagged,
@@ -146,7 +180,7 @@ class MSBoxItem {
   });
 
   String get value {
-    return '0';
+    return '$neighbourMineCounts';
   }
 }
 
