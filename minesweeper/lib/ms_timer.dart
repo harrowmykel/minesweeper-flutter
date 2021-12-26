@@ -26,7 +26,6 @@ class _MSTimerState extends State<MSTimer> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.controller.seconds);
     return MSActionBarText(
       widget.controller.timeFormatted,
       FontAwesomeIcons.clock,
