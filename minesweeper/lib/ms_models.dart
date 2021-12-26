@@ -1,6 +1,7 @@
 enum MSBoxState { opened, flagged, unflagged }
 
 enum MSDifficulty { beginner, intermediate, expert }
+enum MSGameState { won, failed, ingame }
 
 class MSBoxItem {
   MSBoxState state;

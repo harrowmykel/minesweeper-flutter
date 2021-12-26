@@ -26,9 +26,17 @@ class MSBox extends StatelessWidget {
     }
 
     Widget child = const SizedBox.shrink();
+    Color? tColor;
+
+    if (controller.gamestate == MSGameState.failed) tColor = Colors.red;
+    if (controller.gamestate == MSGameState.won) tColor = Colors.green;
+
     Widget boxWidget = Text(
       box.value,
-      style: TextStyle(fontSize: (boxBlockSize - 4)),
+      style: TextStyle(
+        fontSize: (boxBlockSize - 4),
+        color: tColor,
+      ),
     );
 
     bool revealed = box.isOpened;

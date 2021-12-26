@@ -12,6 +12,7 @@ class MSController {
 
   bool openAll = false;
   bool openMines = false;
+  MSGameState gamestate = MSGameState.ingame;
   int flaggedBox = 0;
 
   final Function() _setStateFn;
@@ -77,26 +78,48 @@ class MSController {
   void onBoxClick(MSBoxPosition position) {
     if (!_boardSetUp) _setUpBoard();
     if (!_minesSetUp) _setUpMines(position);
+    if (helpShown) return;
 
     MSBoxItem? box = getBox(position);
     if (box == null) return;
     if (box.isFlagged) return;
     if (box.hasMine) {
       //gameover
-      helpShown = true;
-      _gameOver();
+      gameCompleted(MSGameState.failed);
       return;
     }
     int x = box.position.x;
     int y = box.position.y;
     openNeighboursWithNoMine(x, y);
     box.state = MSBoxState.opened;
+    if (allBoxesExceptMinesOpened) {
+      gameCompleted(MSGameState.won);
+    }
     _setStateFn();
   }
 
-  void _gameOver() {
+//check if boxes that are non mines are closed
+  bool get allBoxesExceptMinesOpened {
+    bool _isClosedBoxAndNotMine = false;
+
+    for (int j = 0; j < boardHeight; j++) {
+      if (_isClosedBoxAndNotMine) break;
+      for (int i = 0; i < boardWidth; i++) {
+        if (_isClosedBoxAndNotMine) break;
+        MSBoxItem box = _boxes[j][i];
+        if (!box.isOpened && !box.hasMine) {
+          _isClosedBoxAndNotMine = true;
+        }
+      }
+    }
+    return !_isClosedBoxAndNotMine;
+  }
+
+  void gameCompleted(MSGameState state) {
+    helpShown = true;
     //open all
     openAll = true;
+    gamestate = state;
     _setStateFn();
   }
 

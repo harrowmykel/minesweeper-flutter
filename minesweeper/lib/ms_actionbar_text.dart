@@ -15,7 +15,7 @@ class MSActionBarText extends StatelessWidget {
     return Container(
       color: Colors.grey.shade400,
       padding: const EdgeInsets.symmetric(
-        horizontal: 10,
+        horizontal: 3,
         vertical: 8,
       ),
       child: Row(
@@ -24,14 +24,14 @@ class MSActionBarText extends StatelessWidget {
           Icon(
             _iconData,
             color: Colors.white,
-            size: 20,
+            size: 12,
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 2),
           Text(
             _text,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 20,
+              fontSize: 12,
             ),
           )
         ],
