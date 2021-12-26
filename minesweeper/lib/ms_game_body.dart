@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:minesweeper/ms_actionbar.dart';
 import 'package:minesweeper/ms_board.dart';
 import 'package:minesweeper/ms_controller.dart';
+import 'package:minesweeper/ms_models.dart';
 
 class MSGameBody extends StatefulWidget {
   const MSGameBody({Key? key}) : super(key: key);
@@ -12,11 +13,16 @@ class MSGameBody extends StatefulWidget {
 
 class _MSGameBodyState extends State<MSGameBody> {
   late MSController controller;
+  MSDifficulty difficulty = MSDifficulty.beginner;
+
   @override
   void initState() {
-    controller = MSController(() {
-      setState(() {});
-    });
+    controller = MSController(
+      () {
+        setState(() {});
+      },
+      difficulty: difficulty,
+    );
     super.initState();
   }
 
@@ -26,10 +32,16 @@ class _MSGameBodyState extends State<MSGameBody> {
       children: [
         MSActionBar(
           controller: controller,
-          reset: () {
-            controller = MSController(() {
-              setState(() {});
-            });
+          reset: (MSDifficulty? _difficulty) {
+            difficulty = _difficulty ?? difficulty;
+
+            controller = MSController(
+              () {
+                setState(() {});
+              },
+              difficulty: difficulty,
+            );
+
             setState(() {});
           },
         ),

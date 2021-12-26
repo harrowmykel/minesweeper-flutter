@@ -7,7 +7,7 @@ import 'package:minesweeper/ms_timer.dart';
 
 class MSActionBar extends StatelessWidget {
   final MSController controller;
-  final Function() reset;
+  final Function(MSDifficulty? _difficulty) reset;
 
   const MSActionBar({
     required this.controller,
@@ -45,8 +45,16 @@ class MSActionBar extends StatelessWidget {
               FontAwesomeIcons.lock,
             ),
             onTap: () {
-              controller.toggleDifficulty();
-              reset();
+              MSDifficulty difficulty = controller.difficulty;
+              if (difficulty == MSDifficulty.intermediate) {
+                difficulty = MSDifficulty.expert;
+              } else if (difficulty == MSDifficulty.expert) {
+                difficulty = MSDifficulty.beginner;
+              } else if (difficulty == MSDifficulty.beginner) {
+                difficulty = MSDifficulty.intermediate;
+              }
+
+              reset(difficulty);
             },
           ),
           const Expanded(
@@ -68,7 +76,7 @@ class MSActionBar extends StatelessWidget {
               FontAwesomeIcons.sync,
               color: Colors.white,
             ),
-            onPressed: reset,
+            onPressed: () => reset(null),
           ),
         ],
       ),

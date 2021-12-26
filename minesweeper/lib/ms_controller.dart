@@ -26,16 +26,6 @@ class MSController {
     this.difficulty = MSDifficulty.expert,
   });
 
-  void toggleDifficulty() {
-    if (difficulty == MSDifficulty.intermediate) {
-      difficulty = MSDifficulty.expert;
-    } else if (difficulty == MSDifficulty.expert) {
-      difficulty = MSDifficulty.beginner;
-    } else if (difficulty == MSDifficulty.beginner) {
-      difficulty = MSDifficulty.intermediate;
-    }
-  }
-
   String get timeFormatted {
     final duration = Duration(seconds: seconds);
     final minutes = duration.inMinutes;
