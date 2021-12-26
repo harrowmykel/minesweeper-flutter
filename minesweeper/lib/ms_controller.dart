@@ -17,6 +17,7 @@ class MSController {
   int flaggedBox = 0;
   Timer? _timer;
   Function()? _timerFn;
+  Function() reset;
 
   final Function() _setStateFn;
   MSDifficulty difficulty;
@@ -24,6 +25,7 @@ class MSController {
   MSController(
     this._setStateFn, {
     this.difficulty = MSDifficulty.expert,
+    required this.reset,
   });
 
   String get timeFormatted {
@@ -88,6 +90,10 @@ class MSController {
     if (!_boardSetUp) _setUpBoard();
     if (!_minesSetUp) _setUpMines(position);
     if (helpShown) return;
+    if (gamestate != MSGameState.ingame) {
+      reset();
+      return;
+    }
 
     MSBoxItem? box = getBox(position);
     if (box == null) return;

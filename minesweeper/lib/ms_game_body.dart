@@ -22,6 +22,7 @@ class _MSGameBodyState extends State<MSGameBody> {
         setState(() {});
       },
       difficulty: difficulty,
+      reset: reset,
     );
     super.initState();
   }
@@ -32,24 +33,27 @@ class _MSGameBodyState extends State<MSGameBody> {
       children: [
         MSActionBar(
           controller: controller,
-          reset: (MSDifficulty? _difficulty) {
-            difficulty = _difficulty ?? difficulty;
-
-            controller = MSController(
-              () {
-                setState(() {});
-              },
-              difficulty: difficulty,
-            );
-
-            setState(() {});
-          },
+          reset: _reset,
         ),
         Expanded(
           child: MSBoard(controller: controller),
         ),
       ],
     );
+  }
+
+  void _reset(MSDifficulty? _difficulty) {
+    difficulty = _difficulty ?? difficulty;
+
+    controller = MSController(() {
+      setState(() {});
+    }, difficulty: difficulty, reset: reset);
+
+    setState(() {});
+  }
+
+  void reset() {
+    _reset(null);
   }
 
   @override
