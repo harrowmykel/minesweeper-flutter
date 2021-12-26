@@ -39,4 +39,10 @@ class _MSGameBodyState extends State<MSGameBody> {
       ],
     );
   }
+
+  @override
+  void dispose() {
+    controller.stopTimer();
+    super.dispose();
+  }
 }

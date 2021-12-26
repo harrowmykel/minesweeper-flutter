@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:minesweeper/ms_actionbar_text.dart';
 import 'package:minesweeper/ms_controller.dart';
+import 'package:minesweeper/ms_timer.dart';
 
 class MSActionBar extends StatelessWidget {
   final MSController controller;
@@ -22,10 +23,7 @@ class MSActionBar extends StatelessWidget {
       color: Colors.purple,
       child: Row(
         children: [
-          MSActionBarText(
-            controller.timeFormatted,
-            FontAwesomeIcons.clock,
-          ),
+          MSTimer(controller: controller),
           const SizedBox(
             width: 5,
           ),

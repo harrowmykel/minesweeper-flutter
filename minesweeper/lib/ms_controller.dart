@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:minesweeper/ms_models.dart';
@@ -14,6 +15,8 @@ class MSController {
   bool openMines = false;
   MSGameState gamestate = MSGameState.ingame;
   int flaggedBox = 0;
+  Timer? _timer;
+  Function()? _timerFn;
 
   final Function() _setStateFn;
   final MSDifficulty difficulty;
@@ -24,7 +27,13 @@ class MSController {
   });
 
   String get timeFormatted {
-    return "00:00";
+    final duration = Duration(seconds: seconds);
+    final minutes = duration.inMinutes;
+    final _seconds = seconds % 60;
+
+    final minutesString = '$minutes'.padLeft(2, '0');
+    final secondsString = '$_seconds'.padLeft(2, '0');
+    return '$minutesString:$secondsString';
   }
 
   int get boardItemsCount {
@@ -163,6 +172,7 @@ class MSController {
 
   void _setUpBoard() {
     if (_boardSetUp) return;
+    _startTimer();
 
     print('board setup');
     _boxes = [];
@@ -291,5 +301,25 @@ class MSController {
     openIfNotMine(x - 1, y + 1);
     openIfNotMine(x, y + 1);
     openIfNotMine(x + 1, y + 1);
+  }
+
+  void stopTimer() {
+    _timer?.cancel();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(
+      const Duration(
+        seconds: 1,
+      ),
+      (Timer timer) {
+        seconds++;
+        if (_timerFn != null) _timerFn!();
+      },
+    );
+  }
+
+  void setTimerStateFn(Function() timerFn) {
+    _timerFn = timerFn;
   }
 }
