@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:minesweeper/ms_actionbar_text.dart';
 import 'package:minesweeper/ms_controller.dart';
+import 'package:minesweeper/ms_models.dart';
 import 'package:minesweeper/ms_timer.dart';
 
 class MSActionBar extends StatelessWidget {
@@ -16,6 +17,10 @@ class MSActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String difficulty = "B";
+    if (controller.difficulty == MSDifficulty.intermediate) difficulty = "I";
+    if (controller.difficulty == MSDifficulty.expert) difficulty = "E";
+
     return Container(
       height: 50,
       width: double.infinity,
@@ -30,6 +35,19 @@ class MSActionBar extends StatelessWidget {
           MSActionBarText(
             '${controller.flagCount}',
             FontAwesomeIcons.flag,
+          ),
+          const SizedBox(
+            width: 10,
+          ),
+          GestureDetector(
+            child: MSActionBarText(
+              difficulty,
+              FontAwesomeIcons.lock,
+            ),
+            onTap: () {
+              controller.toggleDifficulty();
+              reset();
+            },
           ),
           const Expanded(
             child: SizedBox.shrink(),

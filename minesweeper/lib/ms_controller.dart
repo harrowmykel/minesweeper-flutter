@@ -19,12 +19,22 @@ class MSController {
   Function()? _timerFn;
 
   final Function() _setStateFn;
-  final MSDifficulty difficulty;
+  MSDifficulty difficulty;
 
   MSController(
     this._setStateFn, {
     this.difficulty = MSDifficulty.expert,
   });
+
+  void toggleDifficulty() {
+    if (difficulty == MSDifficulty.intermediate) {
+      difficulty = MSDifficulty.expert;
+    } else if (difficulty == MSDifficulty.expert) {
+      difficulty = MSDifficulty.beginner;
+    } else if (difficulty == MSDifficulty.beginner) {
+      difficulty = MSDifficulty.intermediate;
+    }
+  }
 
   String get timeFormatted {
     final duration = Duration(seconds: seconds);
