@@ -89,11 +89,11 @@ class MSController {
   void onBoxClick(MSBoxPosition position) {
     if (!_boardSetUp) _setUpBoard();
     if (!_minesSetUp) _setUpMines(position);
-    if (helpShown) return;
     if (gamestate != MSGameState.ingame) {
       reset();
       return;
     }
+    if (helpShown) return;
 
     MSBoxItem? box = getBox(position);
     if (box == null) return;
