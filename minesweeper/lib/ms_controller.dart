@@ -93,7 +93,7 @@ class MSController {
     if (box == null) return;
     if (box.hasMine) {
       //gameover
-      gameCompleted(MSGameState.failed);
+      _gameCompleted(MSGameState.failed);
       return;
     }
     int x = box.position.x;
@@ -101,7 +101,7 @@ class MSController {
     openNeighboursWithNoMine(x, y);
     box.state = MSBoxState.opened;
     if (allBoxesExceptMinesOpened) {
-      gameCompleted(MSGameState.won);
+      _gameCompleted(MSGameState.won);
     }
     _setStateFn();
   }
@@ -123,11 +123,12 @@ class MSController {
     return !_isClosedBoxAndNotMine;
   }
 
-  void gameCompleted(MSGameState state) {
+  void _gameCompleted(MSGameState state) {
     helpShown = true;
     //open all
     openAll = true;
     gamestate = state;
+    stopTimer();
     _setStateFn();
   }
 
