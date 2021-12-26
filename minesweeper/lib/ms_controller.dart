@@ -20,7 +20,7 @@ class MSController {
 
   MSController(
     this._setStateFn, {
-    this.difficulty = MSDifficulty.beginner,
+    this.difficulty = MSDifficulty.expert,
   });
 
   String get timeFormatted {
@@ -82,7 +82,6 @@ class MSController {
 
     MSBoxItem? box = getBox(position);
     if (box == null) return;
-    if (box.isFlagged) return;
     if (box.hasMine) {
       //gameover
       gameCompleted(MSGameState.failed);
@@ -256,6 +255,14 @@ class MSController {
     openNeighboursWithNoMine(box.position.x, box.position.y);
   }
 
+  void openIfNotMine(int x, int y) {
+    MSBoxItem? box = getBox(MSBoxPosition(x, y));
+    if (box == null) return;
+    if (box.hasMine) return;
+    if (box.isOpened || box.isFlagged) return;
+    box.open();
+  }
+
   void openNeighboursWithNoMine(x, y) {
     //top
     openIfHasNoNeighbourMineAndNotFlagged(x - 1, y - 1);
@@ -268,5 +275,21 @@ class MSController {
     openIfHasNoNeighbourMineAndNotFlagged(x - 1, y + 1);
     openIfHasNoNeighbourMineAndNotFlagged(x, y + 1);
     openIfHasNoNeighbourMineAndNotFlagged(x + 1, y + 1);
+
+    MSBoxItem? box = getBox(MSBoxPosition(x, y));
+    if (box == null) return;
+    if (!box.hasNoNeighbourMine) return;
+
+    //top
+    openIfNotMine(x - 1, y - 1);
+    openIfNotMine(x, y - 1);
+    openIfNotMine(x + 1, y - 1);
+    //same row
+    openIfNotMine(x - 1, y);
+    openIfNotMine(x + 1, y);
+    //bottom
+    openIfNotMine(x - 1, y + 1);
+    openIfNotMine(x, y + 1);
+    openIfNotMine(x + 1, y + 1);
   }
 }
