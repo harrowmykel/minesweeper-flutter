@@ -175,6 +175,8 @@ class MSController {
     if (_boardSetUp) return;
     _startTimer();
 
+    remainingHelp = mineCount ~/ 3;
+
     print('board setup');
     _boxes = [];
 
