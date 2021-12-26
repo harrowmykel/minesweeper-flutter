@@ -48,8 +48,9 @@ class MSBox extends StatelessWidget {
       child = boxWidget;
       revealed = true;
     } else if (box.isFlagged) {
-      child = const Icon(
+      child = Icon(
         FontAwesomeIcons.flag,
+        size: (boxBlockSize - 4),
         color: Colors.red,
       );
     } else if (box.isOpened) {

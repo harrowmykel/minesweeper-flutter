@@ -156,12 +156,10 @@ class MSController {
       return;
     }
     MSBoxItem? box = getBox(position);
-    if (box == null) {
-      return;
-    }
-    if (box.isOpened || flagCount == 0) {
-      return;
-    }
+    if (box == null) return;
+    if (box.isOpened) return;
+    if (flagCount == 0 && !box.isFlagged) return;
+
     if (box.isFlagged) {
       flaggedBox--;
     } else {
